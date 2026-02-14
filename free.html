@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Premium Valentine Challenge ❤️</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            font-family: 'Mali', cursive;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        /* ตกแต่งพื้นหลังลอยๆ */
+        .floating-emoji {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1;
+            animation: floatAnim 6s ease-in-out infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes floatAnim {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(15deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            padding: 40px 30px;
+            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(255, 77, 109, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            transition: all 0.5s ease;
+        }
+
+        #emoji-main {
+            font-size: 6rem;
+            margin-bottom: 10px;
+            display: inline-block;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+        }
+
+        h1 {
+            color: #d90429;
+            font-size: 1.8rem;
+            margin: 10px 0;
+            text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
+        }
+
+        /* แถบเปอร์เซ็นต์แบบสวยๆ */
+        .progress-box {
+            width: 100%;
+            margin: 20px 0;
+        }
+        .progress-bg {
+            width: 100%;
+            height: 14px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        #progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff4d6d, #c9184a);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .percent-label {
+            font-size: 0.9rem;
+            color: #ff4d6d;
+            font-weight: bold;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .btn-area {
+            margin-top: 20px;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+        }
+
+        button {
+            font-family: 'Mali', cursive;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        #yesBtn {
+            background: linear-gradient(45deg, #ff4d6d, #ff758f);
+            color: white;
+            padding: 16px 50px;
+            font-size: 1.5rem;
+            z-index: 5;
+            white-space: nowrap;
+        }
+
+        #noBtn {
+            background: #adb5bd;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1000; /* อยู่หน้าสุดเสมอ */
+        }
+
+        /* หน้า Final */
+        #final-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #ff758f, #ff4d6d);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 99999;
+            text-align: center;
+        }
+
+        .falling-heart {
+            position: fixed;
+            pointer-events: none;
+            animation: heartFall linear forwards;
+        }
+        @keyframes heartFall {
+            to { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="main-card">
+        <div id="emoji-main">🧸</div>
+        <h1>รักเค้าป่าว? ❤️</h1>
+        
+        <div class="progress-box">
+            <div class="progress-bg">
+                <div id="progress-fill"></div>
+            </div>
+            <span class="percent-label">ความพยายามในการหนี: <span id="percent-num">0</span>%</span>
+        </div>
+        
+        <div class="btn-area">
+            <button id="yesBtn">รักที่สุด!</button>
+            <button id="noBtn">ไม่รัก</button>
+        </div>
+    </div>
+
+    <div id="final-screen">
+        <div style="font-size: 8rem;">🥰</div>
+        <h1 style="color: white; font-size: 3rem;">นึกแล้วเชียว!</h1>
+        <p style="font-size: 1.5rem;">เค้าก็รักตัวเองเหมือนกันนะ <br> Happy Valentine's Day! ✨</p>
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const fill = document.getElementById('progress-fill');
+        const percentNum = document.getElementById('percent-num');
+        const emojiMain = document.getElementById('emoji-main');
+
+        let pressCount = 0;
+        const target = 20;
+        const emojiScale = ["🥺", "😟", "😢", "😭", "💔", "😩", "😫", "😤", "😠", "😡", "🤬", "🤯", "🫠", "🤨", "🙄", "😲", "😵‍💫", "🤡", "👹", "💀"];
+
+        // สร้างอีโมจิลอยหลัง
+        function createFloatingDecor() {
+            const emojis = ['❤️', '💖', '✨', '🌸', '☁️'];
+            for(let i=0; i<15; i++) {
+                const div = document.createElement('div');
+                div.className = 'floating-emoji';
+                div.innerHTML = emojis[Math.floor(Math.random()*emojis.length)];
+                div.style.left = Math.random() * 100 + 'vw';
+                div.style.top = Math.random() * 100 + 'vh';
+                div.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                div.style.animationDelay = (Math.random() * 5) + 's';
+                document.body.appendChild(div);
+            }
+        }
+        createFloatingDecor();
+
+        function handleEscape() {
+            if (pressCount < target) {
+                pressCount++;
+                
+                // อัปเดต Progress
+                const pct = Math.round((pressCount / target) * 100);
+                fill.style.width = pct + "%";
+                percentNum.innerText = pct;
+                emojiMain.innerText = emojiScale[pressCount-1] || "💀";
+
+                // คำนวณหาที่ว่าง (ห้ามทับปุ่มรัก และห้ามหลุดจอ)
+                const pad = 30;
+                const yesRect = yesBtn.getBoundingClientRect();
+                let x, y, isOver;
+
+                do {
+                    x = Math.random() * (window.innerWidth - noBtn.offsetWidth - pad * 2) + pad;
+                    y = Math.random() * (window.innerHeight - noBtn.offsetHeight - pad * 2) + pad;
+
+                    // เช็คว่าทับปุ่มรักไหม (เพิ่มระยะปลอดภัย 60px)
+                    isOver = (
+                        x < yesRect.right + 60 &&
+                        x + noBtn.offsetWidth > yesRect.left - 60 &&
+                        y < yesRect.bottom + 60 &&
+                        y + noBtn.offsetHeight > yesRect.top - 60
+                    );
+                } while (isOver);
+
+                noBtn.style.position = 'fixed';
+                noBtn.style.left = x + 'px';
+                noBtn.style.top = y + 'px';
+
+                // ขยายปุ่มรัก (ขยายแบบพอดีๆ ใน 20 ครั้ง)
+                const scale = 1 + (pressCount * 0.4); 
+                yesBtn.style.transform = `scale(${scale})`;
+
+                if (pressCount >= target) {
+                    noBtn.style.display = 'none';
+                    yesBtn.style.transform = 'scale(60)';
+                    yesBtn.style.width = '100vw';
+                    yesBtn.style.borderRadius = '0';
+                    yesBtn.style.zIndex = '9999';
+                    yesBtn.innerText = "ยอมแพ้เถอะ... รักเค้าซะ! ❤️";
+                }
+            }
+        }
+
+        noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); handleEscape(); });
+        noBtn.addEventListener('mouseover', () => { if(window.innerWidth > 768) handleEscape(); });
+
+        yesBtn.addEventListener('click', () => {
+            document.getElementById('final-screen').style.display = 'flex';
+            document.getElementById('main-card').style.display = 'none';
+            
+            // พลุหัวใจตอนจบ
+            setInterval(() => {
+                const h = document.createElement('div');
+                h.className = 'falling-heart';
+                h.innerHTML = ['❤️','💖','✨'][Math.floor(Math.random()*3)];
+                h.style.left = Math.random() * 100 + 'vw';
+                h.style.top = '-50px';
+                h.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                h.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                document.body.appendChild(h);
+                setTimeout(() => h.remove(), 3000);
+            }, 80);
+        });
+    </script>
+</body>
+</html>
